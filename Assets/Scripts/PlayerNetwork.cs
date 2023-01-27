@@ -43,6 +43,14 @@ public class PlayerNetwork : NetworkBehaviour
 
         if (!IsOwner) return;
 
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            TestServerRpc(new ServerRpcParams());
+        }
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            TestClientRpc();
+        }
         if (Input.GetKeyDown(KeyCode.Space))
         {
             randomNumber.Value = new MyCustomData
@@ -55,6 +63,18 @@ public class PlayerNetwork : NetworkBehaviour
 
         Vector2 moveDirection = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
         transform.Translate(moveDirection * Time.deltaTime * 5f);
+    }
+
+    [ServerRpc]
+    private void TestServerRpc(ServerRpcParams serverRpcParams)
+    {
+        Debug.Log("TestServerRpc" + serverRpcParams.Receive.SenderClientId);
+    }
+
+    [ClientRpc]
+    private void TestClientRpc()
+    {
+        Debug.Log("TestClientRpc");
     }
 
 }
