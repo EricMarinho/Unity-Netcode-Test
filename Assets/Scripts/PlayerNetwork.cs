@@ -10,13 +10,20 @@ public class PlayerNetwork : NetworkBehaviour
         new MyCustomData
         {
             _int = 0,
-            _bool = false
+            _bool = false,
         }, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
-    public struct MyCustomData
+    public struct MyCustomData : INetworkSerializable
     {
         public int _int;
         public bool _bool;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref _int);
+            serializer.SerializeValue(ref _bool);
+        }
+
     }
 
     public override void OnNetworkSpawn()
