@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -11,17 +12,20 @@ public class PlayerNetwork : NetworkBehaviour
         {
             _int = 0,
             _bool = false,
+            _fixedString = new FixedString32Bytes("Hello World")
         }, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
     public struct MyCustomData : INetworkSerializable
     {
         public int _int;
         public bool _bool;
+        public FixedString32Bytes _fixedString;
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
             serializer.SerializeValue(ref _int);
             serializer.SerializeValue(ref _bool);
+            serializer.SerializeValue(ref _fixedString);
         }
 
     }
@@ -45,6 +49,7 @@ public class PlayerNetwork : NetworkBehaviour
             {
                 _int = Random.Range(0, 100),
                 _bool = Random.Range(0, 2) == 0,
+                _fixedString = new FixedString32Bytes("New Message")
             };
         }
 
