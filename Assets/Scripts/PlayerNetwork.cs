@@ -49,7 +49,13 @@ public class PlayerNetwork : NetworkBehaviour
         }
         if (Input.GetKeyDown(KeyCode.C))
         {
-            TestClientRpc();
+            TestClientRpc(new ClientRpcParams
+            {
+                Send = new ClientRpcSendParams
+                {
+                    TargetClientIds = new List<ulong> { 1 }
+                }
+            });
         }
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -72,7 +78,7 @@ public class PlayerNetwork : NetworkBehaviour
     }
 
     [ClientRpc]
-    private void TestClientRpc()
+    private void TestClientRpc(ClientRpcParams clientRpcParams)
     {
         Debug.Log("TestClientRpc");
     }
