@@ -7,6 +7,12 @@ using UnityEngine;
 public class PlayerNetwork : NetworkBehaviour
 {
 
+    [SerializeField] private Transform spawnedObjectPrefab;
+    private Transform spawnedObject;
+    private Animator animator;
+    private float speed = 5f;
+    Vector2 lookDirection = new Vector2(1, 0);
+
     private NetworkVariable<MyCustomData> randomNumber = new NetworkVariable<MyCustomData>(
         new MyCustomData
         {
@@ -36,18 +42,21 @@ public class PlayerNetwork : NetworkBehaviour
         {
             Debug.Log(OwnerClientId + "; randomNumber: " + newValue._int + "; " + newValue._bool);
         };
+        animator = GetComponent<Animator>();
     }
 
     private void Update()
     {
 
+
+
         if (!IsOwner) return;
 
-        if (Input.GetKeyDown(KeyCode.S))
+        if (Input.GetKeyDown(KeyCode.Z))
         {
             TestServerRpc(new ServerRpcParams());
         }
-        if (Input.GetKeyDown(KeyCode.C))
+        if (Input.GetKeyDown(KeyCode.X))
         {
             TestClientRpc(new ClientRpcParams
             {
@@ -57,6 +66,7 @@ public class PlayerNetwork : NetworkBehaviour
                 }
             });
         }
+
         if (Input.GetKeyDown(KeyCode.Space))
         {
             randomNumber.Value = new MyCustomData
@@ -68,7 +78,32 @@ public class PlayerNetwork : NetworkBehaviour
         }
 
         Vector2 moveDirection = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
-        transform.Translate(moveDirection * Time.deltaTime * 5f);
+        if (!Mathf.Approximately(moveDirection.x, moveDirection.y))
+        {
+            lookDirection.Set(moveDirection.x, moveDirection.y);
+            lookDirection.Normalize();
+        }
+        transform.Translate(moveDirection * Time.deltaTime * speed);
+        animator.SetFloat("Look X", lookDirection.x);
+        animator.SetFloat("Look Y", lookDirection.y);
+        animator.SetFloat("Speed", moveDirection.magnitude);
+
+        if (!IsServer) return;
+
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            spawnedObject = Instantiate(spawnedObjectPrefab);
+            spawnedObject.GetComponent<NetworkObject>().Spawn(true);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Delete))
+        {
+            if (spawnedObject != null)
+            {
+                spawnedObject.GetComponent<NetworkObject>().Despawn(true);
+            }
+        }
+
     }
 
     [ServerRpc]

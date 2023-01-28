@@ -503,6 +503,11 @@ MonoBehaviour:
       SourcePrefabToOverride: {fileID: 0}
       SourceHashToOverride: 0
       OverridingTargetPrefab: {fileID: 0}
+    - Override: 0
+      Prefab: {fileID: 7230103290756414489, guid: 5ba8f250970bd4746b4a024a04955dc6, type: 3}
+      SourcePrefabToOverride: {fileID: 0}
+      SourceHashToOverride: 0
+      OverridingTargetPrefab: {fileID: 0}
     TickRate: 30
     ClientConnectionBufferTimeout: 10
     ConnectionApproval: 0
@@ -548,13 +553,12 @@ MonoBehaviour:
   m_ProtocolType: 0
   m_MaxPacketQueueSize: 128
   m_MaxPayloadSize: 6144
-  m_MaxSendQueueSize: 98304
   m_HeartbeatTimeoutMS: 500
   m_ConnectTimeoutMS: 1000
   m_MaxConnectAttempts: 60
   m_DisconnectTimeoutMS: 30000
   ConnectionData:
-    Address: 127.0.0.1
+    Address: 192.168.0.109
     Port: 7777
     ServerListenAddress: 
   DebugSimulator:
