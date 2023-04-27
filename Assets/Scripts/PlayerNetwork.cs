@@ -48,8 +48,6 @@ public class PlayerNetwork : NetworkBehaviour
     private void Update()
     {
 
-
-
         if (!IsOwner) return;
 
         if (Input.GetKeyDown(KeyCode.Z))

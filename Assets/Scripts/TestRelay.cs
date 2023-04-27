@@ -10,40 +10,19 @@ using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Networking.Transport.Relay;
 using TMPro;
+using System.Threading.Tasks;
+using System;
 
 public class TestRelay : MonoBehaviour
 {
 
-    [SerializeField] private Button startRelayButton;
-    [SerializeField] private Button joinRelayButton;
-    [SerializeField] private TMP_InputField joinCodeInputField;
-
-
-    private void Awake()
+    private void Start()
     {
-        startRelayButton.onClick.AddListener(() =>
-        {
-            CreateRelay();
-        });
-
-        joinRelayButton.onClick.AddListener(() =>
-        {
-            JoinRelay(joinCodeInputField.text);
-        });
+        NetworkManager.Singleton.OnClientDisconnectCallback += CheckHostDropped;
+        //Maybe I will have to change to ShutdownInProgress or NetworkTransportFailure
     }
 
-    private async void Start()
-    {
-        await UnityServices.InitializeAsync();
-
-        AuthenticationService.Instance.SignedIn += () =>
-        {
-            Debug.Log("Signed in" + AuthenticationService.Instance.PlayerId);
-        };
-        await AuthenticationService.Instance.SignInAnonymouslyAsync();
-    }
-
-    private async void CreateRelay()
+    public async Task<string> CreateRelay()
     {
         try
         {
@@ -58,14 +37,19 @@ public class TestRelay : MonoBehaviour
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
 
             NetworkManager.Singleton.StartHost();
+
+            return joinCode;
         }
         catch (RelayServiceException e)
         {
+            Debug.Log("error");
             Debug.Log(e);
+            return null;
         }
+        
     }
 
-    private async void JoinRelay(string joinCode)
+    public async void JoinRelay(string joinCode)
     {
         try
         {
@@ -84,4 +68,24 @@ public class TestRelay : MonoBehaviour
         }
     }
 
+    public void Disconnect()
+    {
+        NetworkManager.Singleton.Shutdown();
+    }
+
+    public void CheckHostDropped(ulong clientID)
+    {
+        
+        if (clientID == ((ulong)LobbyManager.Instance.actualHost))
+        {
+            Debug.Log("Host Dropped");
+            //LobbyManager.Instance.ChangeActualHost();
+            LobbyManager.Instance.Reconnect();
+            LobbyManager.Instance.isOnLobby = true;
+        }
+        else
+        {
+            LobbyManager.Instance.KickPlayer(clientID);
+        }
+    }
 }
